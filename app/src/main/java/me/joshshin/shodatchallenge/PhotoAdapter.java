@@ -44,7 +44,7 @@ public class PhotoAdapter extends BaseAdapter {
         if(convertView == null)
         {
             LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View layout = inflater.inflate(R.layout.listview_activity, parent, false);
+            View layout = inflater.inflate(R.layout.activity_listview, parent, false);
 
             TextView textView = (TextView) layout.findViewById(R.id.list_text);
             ImageView imageView = (ImageView) layout.findViewById(R.id.list_image);
@@ -52,7 +52,7 @@ public class PhotoAdapter extends BaseAdapter {
             Photo photo = (Photo) getItem(position);
             String text = photo.getTitle();
             textView.setText(text);
-            String url = photo.getThumbnailUrl();
+            String url = changeToHTTPS(photo.getThumbnailUrl());
             Picasso.with(parent.getContext())
                     .load(url)
                     .error(R.drawable.img_not_found)
@@ -65,5 +65,11 @@ public class PhotoAdapter extends BaseAdapter {
         {
             return convertView;
         }
+    }
+
+    public String changeToHTTPS(String orignalStr){
+        StringBuilder string = new StringBuilder(orignalStr);
+        string.insert(4, 's');
+        return string.toString();
     }
 }
