@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Photo photo = pa.getItem(position);
+                //get url for image and send it to PhotoActivity
                 String url = pa.changeToHTTPS(photo.getUrl());
                 Intent intent = new Intent(MainActivity.this, PhotoActivity.class);
                 Bundle bundle = new Bundle();
