@@ -13,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by jjshin on 5/22/16.
  */
-public class APIServiceGenerator {
+public class PhotoServiceGenerator {
 
     public static final String API_BASE_URL = "http://jsonplaceholder.typicode.com/";
 
