@@ -9,10 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -26,10 +28,12 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     PhotoService photoService;
-    Button callAPIButton;
     List<Photo> photos;
     PhotoAdapter adapter;
     ListView listView;
+    FloatingActionButton forward_fab;
+    FloatingActionButton backward_fab;
+    int album = 1;
 
 
     @Override
@@ -40,33 +44,29 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         listView = (ListView) findViewById(R.id.listview);
-        callAPIButton = (Button) findViewById(R.id.call_api_button);
+        photoService = PhotoServiceGenerator.createService(PhotoService.class);
+        forward_fab = (FloatingActionButton) findViewById(R.id.forward_fab);
+        backward_fab = (FloatingActionButton) findViewById(R.id.backward_fab);
 
-        callAPIButton.setOnClickListener(new View.OnClickListener() {
+        getPhotos(photoService, 1);
+
+        forward_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("onclick", "On Click called");
-                photoService = PhotoServiceGenerator.createService(PhotoService.class);
-                Call<List<Photo>> getCall = photoService.getPhotos(1, 0);
-                getCall.enqueue(new Callback<List<Photo>>(){
-
-                    @Override
-                    public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
-                        Log.i("getPages onResponse", "Pages: onSuccess: " + response.body() + "; onError: " + response.errorBody());
-                        photos = response.body();
-                        adapter = new PhotoAdapter(getBaseContext(), R.layout.listview_activity, photos);
-                        listView.setAdapter(adapter);
-                        Log.i("ListView called", "ListView instantiated with response data... hopefully");
-                    }
-
-                    @Override
-                    public void onFailure(Call<List<Photo>> call, Throwable t) {
-                        Log.i("getPages onFailure", t.toString());
-                    }
-                });
+                int tempVal = album;
+                album = tempVal + 2;
+                getPhotos(photoService, album);
             }
         });
 
+        backward_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int tempVal = album;
+                album = tempVal - 2;
+                getPhotos(photoService, album);
+            }
+        });
 
     }
 
@@ -92,5 +92,33 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void getPhotos(PhotoService ps, final int albumNum) {
+        Call<List<Photo>> getCall = ps.getPhotos(albumNum, albumNum + 1);
+        getCall.enqueue(new Callback<List<Photo>>(){
+
+            @Override
+            public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
+                Log.i("getPhotos onResponse", "Pages: onSuccess: " + response.body() + "; onError: " + response.errorBody());
+                photos = response.body();
+                adapter = new PhotoAdapter(getBaseContext(), R.layout.listview_activity, photos);
+                listView.setAdapter(adapter);
+                Log.i("Photos list size: ", "" + photos.size());
+                Log.i("getPhotos albums: ", "" + albumNum + ", " + (albumNum + 1));
+            }
+
+            @Override
+            public void onFailure(Call<List<Photo>> call, Throwable t) {
+                Log.i("getPhotos onFailure", t.toString());
+            }
+        });
+        //Set visibility of back navigation
+        if(albumNum == 1) {
+            backward_fab.setVisibility(View.INVISIBLE);
+        } else {
+            if(backward_fab.getVisibility() == View.INVISIBLE) {
+                backward_fab.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
 }

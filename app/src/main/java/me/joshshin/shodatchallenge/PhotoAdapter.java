@@ -8,6 +8,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 import me.joshshin.shodatchallenge.models.Photo;
@@ -44,10 +46,18 @@ public class PhotoAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View layout = inflater.inflate(R.layout.listview_activity, parent, false);
 
-            TextView tv = (TextView) layout.findViewById(R.id.list_text);
+            TextView textView = (TextView) layout.findViewById(R.id.list_text);
+            ImageView imageView = (ImageView) layout.findViewById(R.id.list_image);
+
             Photo photo = (Photo) getItem(position);
             String text = photo.getTitle();
-            tv.setText(text);
+            textView.setText(text);
+            String url = photo.getThumbnailUrl();
+            Picasso.with(parent.getContext())
+                    .load(url)
+                    .error(R.drawable.img_not_found)
+                    .resize(50, 50)
+                    .into(imageView);
 
             return layout;
         }

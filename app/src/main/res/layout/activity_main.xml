@@ -23,12 +23,21 @@
 
     <include layout="@layout/content_main" />
 
+
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/backward_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|left"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/back_arrow" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/forward_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email" />
+        android:src="@drawable/forward_arrow" />
 
 </android.support.design.widget.CoordinatorLayout>
