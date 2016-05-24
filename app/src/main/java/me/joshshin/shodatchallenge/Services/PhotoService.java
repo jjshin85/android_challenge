@@ -11,7 +11,7 @@ import retrofit2.http.Query;
 /**
  * Created by jjshin on 5/22/16.
  */
-public interface APIService {
+public interface PhotoService {
     @GET("photos/")
     Call<List<Photo>> getPhotos(@Query("albumId") int id1, @Query("albumId") int id2);
 }

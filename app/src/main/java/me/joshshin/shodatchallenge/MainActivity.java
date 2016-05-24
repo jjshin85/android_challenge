@@ -9,12 +9,15 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
-import me.joshshin.shodatchallenge.Services.APIService;
-import me.joshshin.shodatchallenge.Services.APIServiceGenerator;
+import me.joshshin.shodatchallenge.Services.PhotoService;
+import me.joshshin.shodatchallenge.Services.PhotoServiceGenerator;
 import me.joshshin.shodatchallenge.models.Photo;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,8 +25,12 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button callAPI;
-    APIService mAPIService;
+    PhotoService photoService;
+    Button callAPIButton;
+    List<Photo> photos;
+    PhotoAdapter adapter;
+    ListView listView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,28 +39,24 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        listView = (ListView) findViewById(R.id.listview);
+        callAPIButton = (Button) findViewById(R.id.call_api_button);
 
-        callAPI = (Button) findViewById(R.id.call_api_button);
-        callAPI.setOnClickListener(new View.OnClickListener() {
+        callAPIButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("onclick", "On Click called");
-                mAPIService = APIServiceGenerator.createService(APIService.class);
-                Call<List<Photo>> getCall = mAPIService.getPhotos(1,2);
+                photoService = PhotoServiceGenerator.createService(PhotoService.class);
+                Call<List<Photo>> getCall = photoService.getPhotos(1, 0);
                 getCall.enqueue(new Callback<List<Photo>>(){
 
                     @Override
                     public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
                         Log.i("getPages onResponse", "Pages: onSuccess: " + response.body() + "; onError: " + response.errorBody());
-                        List<Photo> photos = response.body();
+                        photos = response.body();
+                        adapter = new PhotoAdapter(getBaseContext(), R.layout.listview_activity, photos);
+                        listView.setAdapter(adapter);
+                        Log.i("ListView called", "ListView instantiated with response data... hopefully");
                     }
 
                     @Override
@@ -63,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+
     }
 
     @Override
@@ -86,4 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 }
