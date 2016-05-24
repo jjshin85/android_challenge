@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,12 +29,12 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     PhotoService photoService;
-    List<Photo> photos;
     PhotoAdapter adapter;
     ListView listView;
     FloatingActionButton forward_fab;
     FloatingActionButton backward_fab;
     int album = 1;
+    List<Photo> photos;
 
 
     @Override
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         forward_fab = (FloatingActionButton) findViewById(R.id.forward_fab);
         backward_fab = (FloatingActionButton) findViewById(R.id.backward_fab);
 
-        getPhotos(photoService, 1);
+        getPhotos(photoService, album);
 
         forward_fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,18 +93,18 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void getPhotos(PhotoService ps, final int albumNum) {
+    public List<Photo> getPhotos(PhotoService ps, final int albumNum) {
         Call<List<Photo>> getCall = ps.getPhotos(albumNum, albumNum + 1);
         getCall.enqueue(new Callback<List<Photo>>(){
-
             @Override
             public void onResponse(Call<List<Photo>> call, Response<List<Photo>> response) {
                 Log.i("getPhotos onResponse", "Pages: onSuccess: " + response.body() + "; onError: " + response.errorBody());
                 photos = response.body();
-                adapter = new PhotoAdapter(getBaseContext(), R.layout.listview_activity, photos);
-                listView.setAdapter(adapter);
                 Log.i("Photos list size: ", "" + photos.size());
                 Log.i("getPhotos albums: ", "" + albumNum + ", " + (albumNum + 1));
+                adapter = new PhotoAdapter(getBaseContext(), R.layout.listview_activity, photos);
+                listView.setAdapter(adapter);
+                setUpItemClickListener(listView, adapter);
             }
 
             @Override
@@ -119,6 +120,17 @@ public class MainActivity extends AppCompatActivity {
                 backward_fab.setVisibility(View.VISIBLE);
             }
         }
+        return photos;
+    }
+
+    public void setUpItemClickListener(ListView lv, final PhotoAdapter pa){
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Log.i("View id", "" + pa.getItemId(position));
+            }
+        });
     }
 
 }
